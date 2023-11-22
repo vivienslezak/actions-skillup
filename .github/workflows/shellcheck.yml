@@ -1,0 +1,22 @@
+name: build_java
+on:
+  push:
+    branches: [ "**" ]
+  schedule:
+    - cron: "5 19 * * 1"
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+#      - uses: awalsh128/cache-apt-pkgs-action@latest
+#        with:
+#          packages: shellcheck
+#          version: 0.8.0
+      - name: 'Install shellcheck'
+        run: apt install -y shellcheck
+      - name: 'Check pre-deploy script'
+        run: |
+         shellcheck pre_deploy.sh
+         if [ $? -eq 0 ]; then echo "exit "$?": Shellcheck completed. No issues found."; fi
