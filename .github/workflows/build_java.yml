@@ -25,6 +25,6 @@ jobs:
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
-          name: $JAVA_JAR_NAME
+          name: ${{ secrets.JAVA_JAR_NAME }}
           path: build/libs/${{ secrets.JAVA_JAR_NAME }}.zip
           if-no-files-found: error
