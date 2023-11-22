@@ -15,7 +15,7 @@ jobs:
 #          packages: shellcheck
 #          version: 0.8.0
       - name: 'Install shellcheck'
-        run: apt install -y shellcheck
+        run: sudo apt install -y shellcheck
       - name: 'Check pre-deploy script'
         run: |
          shellcheck pre_deploy.sh
