@@ -19,12 +19,12 @@ jobs:
          ./gradlew :spotlessApply
          ./gradlew build
          cd ./build/libs
-         zip $JAVA_JAR_NAME.zip *.jar
+         zip ${{ secrets.JAVA_JAR_NAME}}.zip *.jar
          pwd
          ls -lath
       - name: 'Upload Artifact'
         uses: actions/upload-artifact@v2
         with:
           name: $JAVA_JAR_NAME
-          path: build/libs/${JAVA_JAR_NAME}.zip
+          path: build/libs/${{ secrets.JAVA_JAR_NAME }}.zip
           if-no-files-found: error
