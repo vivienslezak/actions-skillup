@@ -1,0 +1,20 @@
+name: build_java
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Java Environment
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11.0.16'
+      - name: Build Java Application
+        run: |
+         ./gradlew :spotlessApply
+         ./gradlew build

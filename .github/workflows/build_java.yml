@@ -7,14 +7,22 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
+      - name: 'Checkout'
         uses: actions/checkout@v2
-      - name: Set up Java Environment
+      - name: 'Set up Java Environment'
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
           java-version: '11.0.16'
-      - name: Build Java Application
+      - name: 'Build Java Application'
         run: |
          ./gradlew :spotlessApply
          ./gradlew build
+         cd ./build/libs
+         zip $JAVA_JAR_NAME.zip *.jar
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: $JAVA_JAR_NAME
+          path: ./build/libs/$JAVA_JAR_NAME.zip
+          if-no-files-found: error
