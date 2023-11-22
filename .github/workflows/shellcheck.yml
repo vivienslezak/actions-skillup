@@ -1,4 +1,4 @@
-name: build_java
+name: shellcheck
 on:
   push:
     branches: []
