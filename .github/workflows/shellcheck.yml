@@ -1,11 +1,11 @@
 name: build_java
 on:
   push:
-    branches: [ "**" ]
+    branches: []
   schedule:
     - cron: "5 19 * * 1"
 jobs:
-  build:
+  check:
     runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout'
