@@ -15,7 +15,7 @@ else
 	ls -lath
 fi
 
-for item in "$VAR2";
+for item in $VAR2;
 do
 	echo "This is the value: $item"
 done
