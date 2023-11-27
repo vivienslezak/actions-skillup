@@ -23,3 +23,5 @@ jobs:
           name: ${{ secrets.JAVA_JAR_NAME }}
           path: build/libs/*
           if-no-files-found: error
+      - name: 'List all environment variables'
+        run: env
