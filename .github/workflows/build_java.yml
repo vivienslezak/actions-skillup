@@ -1,7 +1,7 @@
 name: build_java
 on:
   push:
-    branches: [ main ]
+    branches: [ envvar ]
 jobs:
   build:
     runs-on: ubuntu-22.04
