@@ -12,9 +12,11 @@ jobs:
       - name: Set up Java Environment
         run: |
          curl -s "https://get.sdkman.io" | bash
-         source "$HOME/.sdkman/bin/sdkman-init.sh"
+         bash -c "source $HOME/.sdkman/bin/sdkman-init.sh"
          sdk install java 11.0.16-zulu
          sdk install gradle 7.4
+         sdk version
+         sdk help
          whereis sdk
          sudo find / -name sdk
          sudo find / -name java
