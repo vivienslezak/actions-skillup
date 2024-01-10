@@ -1,0 +1,22 @@
+name: build_java
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Java Environment
+        run: |
+         curl -s "https://get.sdkman.io" | bash
+         source "$HOME/.sdkman/bin/sdkman-init.sh"
+         sdk install java 11.0.16-zulu
+         sdk install gradle 7.4
+         whereis sdk
+         find / -name sdk
+         find / -name java
+         echo $SDKMAN_DIR
+         echo $JAVA_HOME
