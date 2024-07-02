@@ -1,0 +1,37 @@
+name: actions_events
+on:
+  push:
+    branches: [ envvar ]
+jobs:
+  check-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for open pull requests
+        id: check_pr
+        run: |
+          OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository }}:main" | jq '. | length')
+          echo "open_pr_count=$OPEN_PR_COUNT" >> $GITHUB_ENV
+
+      - name: Set needs_run output
+        id: set_needs_run
+        run: |
+          if [ "$OPEN_PR_COUNT" -eq "0" ]; then
+            echo "::set-output name=needs_run::true"
+          else
+            echo "::set-output name=needs_run::false"
+          fi
+        env:
+          OPEN_PR_COUNT: ${{ env.open_pr_count }}
+
+  run-tests:
+    needs: check-pr
+    if: needs.check-pr.outputs.needs_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run tests
+        run: |
+          # Your test script here
