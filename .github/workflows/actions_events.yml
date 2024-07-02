@@ -30,7 +30,7 @@ jobs:
 
   run-tests:
     needs: check-pr
-    if: ${{ needs.check-pr.outputs.pipeline_run == 'false' }}
+    if: needs.check-pr.outputs.pipeline_run == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -38,4 +38,4 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Open PR count is $GITHUB_ENV and it's set value is $GITHUB_OUTPUT."
+          echo "Test"
