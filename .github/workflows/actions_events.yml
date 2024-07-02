@@ -9,24 +9,24 @@ jobs:
       - name: Check for open pull requests
         id: check_pr
         run: |
-          OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository }}:main" | jq '. | length')
           echo "open_pr_count=$OPEN_PR_COUNT" >> $GITHUB_ENV
 
-      - name: Set needs_run output
-        id: set_needs_run
+      - name: Set pipeline_run output
+        id: set_pipeline_run
         run: |
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
-            echo "::set-output name=needs_run::true"
+            echo "{pipeline_run}={true}" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=needs_run::false"
+            echo "{pipeline_run}={false}" >> $GITHUB_OUTPUT
           fi
         env:
           OPEN_PR_COUNT: ${{ env.open_pr_count }}
 
   run-tests:
     needs: check-pr
-    if: needs.check-pr.outputs.needs_run == 'true'
+    if: needs.check-pr.outputs.pipeline_run == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -34,4 +34,4 @@ jobs:
 
       - name: Run tests
         run: |
-          # Your test script here
+          echo "Open PR count is $GITHUB_ENV and it's set value is $GITHUB_OUTPUT ."
