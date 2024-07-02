@@ -20,10 +20,10 @@ jobs:
         run: |
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "{pipeline_run}={true}" >> "$GITHUB_OUTPUT"
-            echo "GitHub output is: ${{ needs.check-pr.outputs.pipeline_run }}"
+            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           else
             echo "{pipeline_run}={false}" >> "$GITHUB_OUTPUT"
-            echo "GitHub output is: ${{ needs.check-pr.outputs.pipeline_run }}"
+            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
         env:
           OPEN_PR_COUNT: ${{ env.open_pr_count }}
