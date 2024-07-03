@@ -21,7 +21,7 @@ jobs:
 
   run-tests:
     needs: check-pr
-    if: !(${{ github.ref }} && ${{ github.event_name }} == "push" && ${{ needs.check-pr.outputs.open-pr == "true" }}) || always()
+    if: ${{ github.ref }} && ${{ github.event_name }} == "push" && ${{ needs.check-pr.outputs.open-pr == "false" }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
