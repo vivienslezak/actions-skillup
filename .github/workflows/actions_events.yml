@@ -11,10 +11,13 @@ jobs:
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
+          echo "%OPEN_PR_COUNT"
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "open-pr=false" >> "$GITHUB_OUTPUT"
+            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           else
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
+            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
     outputs:
       open-pr: ${{ steps.set-pipeline-run.outputs.open-pr }}
