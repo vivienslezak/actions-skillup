@@ -11,20 +11,25 @@ jobs:
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
-          echo "Open pr count is: $OPEN_PR_COUNT"
+## Needs to be tested. ##
+## If they change the pull request state to open, it has to be added. ##
+#          IS_IT_DRAFT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
+#            "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"draft\"\: \"true\"' | wc -l)
+#          if [ "$OPEN_PR_COUNT" -eq "0" ] && [ "IS_IT_DRAFT" -eq "0"]; then
+##                    ##
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
-            echo "pipeline-run=true" >> "$GITHUB_OUTPUT"
-            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
+            echo "open-pr=false" >> "$GITHUB_OUTPUT"
+#            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           else
-            echo "pipeline-run=false" >> "$GITHUB_OUTPUT"
-            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
+            echo "open-pr=true" >> "$GITHUB_OUTPUT"
+#            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
     outputs:
       pipeline-run: ${{ steps.set-pipeline-run.outputs.pipeline-run }}
 
   run-tests:
     needs: check-pr
-    if: ${{ needs.check-pr.outputs.pipeline-run == 'true' }}
+    if: !(${{ github.ref }} && ${{ github.event_name }} == "push" && ${{ needs.check-pr.outputs.open-pr == "true" }}) || always()
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -32,4 +37,4 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Test 3"
+          echo "Test"
