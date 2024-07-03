@@ -33,4 +33,4 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Test ${{ github.ref }} "
+          echo "Test 1 ${{ github.ref }} "
