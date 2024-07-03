@@ -11,7 +11,7 @@ jobs:
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
-          echo "%OPEN_PR_COUNT"
+          echo "$OPEN_PR_COUNT"
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "open-pr=false" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
@@ -24,7 +24,8 @@ jobs:
 
   run-tests:
     needs: check-pr
-    if: ${{ needs.check-pr.outputs.open-pr == 'false' }} && ${{ github.ref }} && ${{ github.event_name }} == "push"
+#    if: ${{ needs.check-pr.outputs.open-pr == 'false' }} && ${{ github.ref }} && ${{ github.event_name }} == "push"
+    if: ${{ needs.check-pr.outputs.open-pr == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
