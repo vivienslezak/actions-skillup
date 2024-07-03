@@ -26,8 +26,8 @@ jobs:
             echo "{pipeline_run}={false}" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
-        outputs:
-          pipeline_run: ${{ steps.set_pipeline_run.outputs.pipeline_run }}
+    outputs:
+      pipeline_run: ${{ steps.set_pipeline_run.outputs.pipeline_run }}
 #        env:
 #          OPEN_PR_COUNT: ${{ env.open_pr_count }}
 
