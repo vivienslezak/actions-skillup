@@ -24,8 +24,7 @@ jobs:
 
   run-tests:
     needs: check-pr
-#    if: ${{ needs.check-pr.outputs.open-pr == 'false' }} && ${{ github.ref }} && ${{ github.event_name }} == "push"
-    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.ref) && (github.event_name == 'push') }}
+    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.ref == 'refs/heads/*' ) && (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
