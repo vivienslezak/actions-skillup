@@ -25,7 +25,7 @@ jobs:
 #            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
     outputs:
-      pipeline-run: ${{ steps.set-pipeline-run.outputs.pipeline-run }}
+      open-pr: ${{ steps.set-pipeline-run.outputs.open-pr }}
 
   run-tests:
     needs: check-pr
