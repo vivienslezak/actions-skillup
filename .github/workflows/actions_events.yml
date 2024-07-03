@@ -10,9 +10,8 @@ jobs:
         id: set-pipeline-run
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository }}:envvar | jq '. | length'")
+            "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
           echo "Open pr count is: $OPEN_PR_COUNT"
-          echo "curl -s -H 'Authorization: token ${{ secrets.TEST_TOKEN }}' 'https://api.github.com/repos/${{ github.repository }}/pulls?state=open&head=${{ github.repository }}:envvar'"
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "pipeline-run=true" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
