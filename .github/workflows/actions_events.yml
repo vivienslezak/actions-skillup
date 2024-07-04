@@ -2,7 +2,7 @@ name: actions_events
 on:
   push:
     branches: [ envvar ]
-    tags: [ '*' ]
+    tags: [ '^v\d+.\d+.\d+' ]
 jobs:
   check-pr:
     runs-on: ubuntu-latest
@@ -16,18 +16,16 @@ jobs:
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "open-pr=false" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
-            echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , tag name: ${{ github.event.release.tag_name }} , ref type: ${{ github.ref_type }} ."
           else
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
-            echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , tag name: ${{ github.event.release.tag_name }} , ref type: ${{ github.ref_type }} ."
           fi
     outputs:
       open-pr: ${{ steps.set-pipeline-run.outputs.open-pr }}
 
   run-tests:
     needs: check-pr
-    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && (github.ref_type == 'tag') }}
+    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && (github.ref_type == 'branch') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -35,4 +33,4 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , tag name: ${{ github.event.release.tag_name }} , ref type: ${{ github.ref_type }} ."
+          echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
