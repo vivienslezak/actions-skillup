@@ -1,7 +1,7 @@
 name: actions_events
-on:
-  push:
-    branches: [ envvar ]
+#on:
+#  push:
+#    branches: [ envvar ]
 jobs:
   check-pr:
     runs-on: ubuntu-latest
