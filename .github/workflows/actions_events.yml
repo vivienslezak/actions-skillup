@@ -25,6 +25,7 @@ jobs:
   run-tests:
     needs: check-pr
     if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && ! (github.ref == 'refs/tags/') }}
+## github.ref has to be tested with tag to see ig it gets triggered!
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
