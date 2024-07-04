@@ -2,13 +2,13 @@ name: actions_events
 on:
   push:
     branches: [ envvar ]
-    tags: [ '^v\d+.\d+.\d+' ]
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 jobs:
   check-pr:
     runs-on: ubuntu-latest
     steps:
-      - name: Set pipeline-run output
-        id: set-pipeline-run
+      - name: Set open-pr output
+        id: set-open-pr
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
@@ -20,10 +20,17 @@ jobs:
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
+      - name: Set regex-match output
+        id: set-regex-match
+        run: |
+          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "regex-match=true" >> "$GITHUB_OUTPUT"
+          fi
     outputs:
       open-pr: ${{ steps.set-pipeline-run.outputs.open-pr }}
+      regex-match: ${{ steps.set-regex-match.outputs.regex-match }}
 
-  run-tests:
+  run-test-if-one:
     needs: check-pr
     if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && (github.ref_type == 'branch') }}
     runs-on: ubuntu-latest
@@ -34,3 +41,15 @@ jobs:
       - name: Run tests
         run: |
           echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
+
+  run-test-if-two:
+    needs: check-pr
+    if: ${{ (needs.check-pr.outputs.regex-match == 'true') && (github.event_name == 'push') && (github.ref_type == 'tag') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Variable values: openpr: ${{ needs.check-pr.outputs.regex-match }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
