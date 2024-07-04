@@ -1,8 +1,8 @@
 name: actions_events
-on:
-  push:
-    branches: [ envvar ]
-    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+on: push
+#  push:
+#    branches: [ envvar ]
+#    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 jobs:
   check-pr:
     runs-on: ubuntu-latest
@@ -20,6 +20,7 @@ jobs:
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
+
       - name: Set regex-match output
         id: set-regex-match
         run: |
