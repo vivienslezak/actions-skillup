@@ -1,13 +1,12 @@
 name: actions_events
-on: push
+on:
+  push:
+    branches: [ envvar ]
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 
 concurrency:
-  group: ${{ github.workflow }}
+  group: ${{ github.workflow }}-${{ github.sha }}
   cancel-in-progress: true
-#  push:
-#    branches: [ envvar ]
-#    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
-
 
 jobs:
   check-pr:
