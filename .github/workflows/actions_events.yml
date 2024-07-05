@@ -41,8 +41,9 @@ jobs:
 
       - name: Find node
         run: |
-          FIND_PATH=$(ls -la / | grep -v proc | grep -v tmp | grep -v dev | grep -v sys | grep -v mnt | sed 1,3d | awk -F' ' '{print $9}')
-          echo "$FIND_PATH"
+          FIND_PATH=$(ls -la / | grep -v proc | grep -v tmp | grep -v dev | grep -v sys | grep -v mnt | grep -v boot | sed 1,3d | awk -F' ' '{print $9}')
+          node -v
+          whereis node
           for path in $FIND_PATH; do find /$path -name node; done
 
       - name: Run tests
