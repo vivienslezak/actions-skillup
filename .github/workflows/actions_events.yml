@@ -21,15 +21,15 @@ jobs:
             ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
 
-      - name: Set regex-match output
-        id: set-regex-match
-        run: |
-          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "regex-match=true" >> "$GITHUB_OUTPUT"
-          fi
+#      - name: Set regex-match output
+#        id: set-regex-match
+#        run: |
+#          if [[ ${{ github.event.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+#            echo "regex-match=true" >> "$GITHUB_OUTPUT"
+#          fi
     outputs:
       open-pr: ${{ steps.set-pipeline-run.outputs.open-pr }}
-      regex-match: ${{ steps.set-regex-match.outputs.regex-match }}
+#      regex-match: ${{ steps.set-regex-match.outputs.regex-match }}
 
   run-test-if-one:
     needs: check-pr
