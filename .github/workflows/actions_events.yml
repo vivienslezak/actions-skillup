@@ -15,10 +15,8 @@ jobs:
           echo "$OPEN_PR_COUNT"
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "open-pr=false" >> "$GITHUB_OUTPUT"
-            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           else
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
-            ECHO_OUTPUT=$(cat $GITHUB_OUTPUT) && echo "GitHub output is: $ECHO_OUTPUT"
           fi
 
 #      - name: Set regex-match output
@@ -33,7 +31,7 @@ jobs:
 
   run-test-if-one:
     needs: check-pr
-    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && (github.ref_type == 'branch') }}
+    if: ${{ needs.check-pr.outputs.open-pr == 'false' && github.event_name == 'push' && github.ref_type == 'branch' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
