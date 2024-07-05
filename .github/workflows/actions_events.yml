@@ -1,7 +1,7 @@
 name: actions_events
-on:
-  push:
-    branches: [ envvar ]
+on: push
+#  push:
+#    branches: [ envvar ]
 #    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 jobs:
   check-pr:
@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        run: |
+          find / -name node
 
       - name: Run tests
         run: |
