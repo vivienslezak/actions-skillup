@@ -41,7 +41,7 @@ jobs:
 
       - name: Find node
         run: |
-          find / -name node
+          find /__e -name node
 
       - name: Run tests
         run: |
