@@ -42,7 +42,7 @@ jobs:
       - name: Find node
         run: |
           FIND_PATH=$(ls -lath / | grep -v proc | grep -v tmp | grep -v dev | grep -v sys | grep -v mnt | awk -F' ' '{print $9}')
-          for $path in $FIND_PATH; do find /$path -name node; done
+          for path in $FIND_PATH; do find /$path -name node; done
 
       - name: Run tests
         run: |
