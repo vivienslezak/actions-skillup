@@ -1,8 +1,14 @@
 name: actions_events
 on: push
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 #  push:
 #    branches: [ envvar ]
 #    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+
+
 jobs:
   check-pr:
     runs-on: ubuntu-latest
