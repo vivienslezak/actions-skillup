@@ -1,7 +1,7 @@
 name: actions_events
-on:
-  push:
-    branches: [ envvar ]
+on: push
+#  push:
+#    branches: [ envvar ]
 #    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 jobs:
   check-pr:
@@ -33,31 +33,24 @@ jobs:
 
   run-test-if-one:
     needs: check-pr
-#    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && (github.ref_type == 'branch') }}
+    if: ${{ (needs.check-pr.outputs.open-pr == 'false') && (github.event_name == 'push') && (github.ref_type == 'branch') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Find node
-        run: |
-          FIND_PATH=$(ls -la / | grep -v proc | grep -v tmp | grep -v dev | grep -v sys | grep -v mnt | grep -v boot | sed 1,3d | awk -F' ' '{print $9}')
-          node -v
-          whereis node
-          for path in $FIND_PATH; do find /$path -name node; done
 
       - name: Run tests
         run: |
           echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
 
-  run-test-if-two:
-    needs: check-pr
-    if: ${{ (needs.check-pr.outputs.regex-match == 'true') && (github.event_name == 'push') && (github.ref_type == 'tag') }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
-        run: |
-          echo "Variable values: openpr: ${{ needs.check-pr.outputs.regex-match }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
+#  run-test-if-two:
+#    needs: check-pr
+#    if: ${{ (needs.check-pr.outputs.regex-match == 'true') && (github.event_name == 'push') && (github.ref_type == 'tag') }}
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Run tests
+#        run: |
+#          echo "Variable values: openpr: ${{ needs.check-pr.outputs.regex-match }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
