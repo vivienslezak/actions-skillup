@@ -31,7 +31,8 @@ jobs:
 
   run-test-if-one:
     needs: check-pr
-    if: ${{ needs.check-pr.outputs.open-pr == 'false' && github.event_name == 'push' && github.ref_type == 'branch' }}
+#    if: ${{ needs.check-pr.outputs.open-pr == 'false' && github.event_name == 'push' && github.ref_type == 'branch' }}
+    if: ${{ needs.check-pr.outputs.open-pr == 'false' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
