@@ -39,7 +39,7 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
+          echo "Variable valuess: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
 
 #  run-test-if-two:
 #    needs: check-pr
