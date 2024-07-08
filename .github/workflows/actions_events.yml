@@ -29,7 +29,9 @@ jobs:
         run: |
           LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/tags" | jq -r '.[0].name')
-          if [[ $LATEST_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          LATEST_TAG_SHA=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/tags" | jq -r '.[0].commit.sha')
+          if [[ $LATEST_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $LATEST_TAG_SHA == ${{ github.sha }} ]]; then
             echo "regex-match=true" >> "$GITHUB_OUTPUT"
           fi
     outputs:
