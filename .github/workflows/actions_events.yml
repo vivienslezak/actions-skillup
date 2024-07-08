@@ -2,7 +2,7 @@ name: actions_events
 on:
   push:
     branches: [ envvar ]
-    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+#    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}-${{ github.event_name }}
@@ -56,4 +56,4 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values: openpr: ${{ needs.check-pr.outputs.regex-match }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} ."
+          echo "Variable values: openpr: ${{ needs.check-pr.outputs.regex-match }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , ref name: ${{ github.ref_name }} ."
