@@ -1,15 +1,15 @@
 name: actions_events
-on: push
-#  push:
-#    branches: [ envvar ]
-#    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+on:
+  push:
+    branches: [ envvar ]
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
-  check-pr:
+  check-values:
     runs-on: ubuntu-latest
     steps:
       - name: Set open-pr output
@@ -24,23 +24,38 @@ jobs:
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Set regex-match output
-        id: set-regex-match
+      - name: Set tag-run output
+        id: set-tag-run
         run: |
           LATEST_TAG=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/tags" | jq -r '.[0].name')
           LATEST_TAG_SHA=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/tags" | jq -r '.[0].commit.sha')
           if [[ $LATEST_TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ $LATEST_TAG_SHA == ${{ github.sha }} ]]; then
-            echo "regex-match=true" >> "$GITHUB_OUTPUT"
+            echo "tag-run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag-run=false" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Set workflow-run output
+        id: set-workflow-run
+        run: |
+          if [[ ${{ steps.set-open-pr.outputs.open-pr }} == 'false' ]] && [[ ${{ github.event_name }} == 'push' ]] && [[ ${{ github.ref_type }} == 'branch' ]]; then
+            echo "workflow-run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "workflow-run=true" >> "$GITHUB_OUTPUT"
+          fi
+
     outputs:
       open-pr: ${{ steps.set-open-pr.outputs.open-pr }}
-      regex-match: ${{ steps.set-regex-match.outputs.regex-match }}
+      tag-run: ${{ steps.set-tag-run.outputs.tag-run }}
+      workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run}}
 
-  run-test-if-one:
-    needs: check-pr
-    if: ${{ needs.check-pr.outputs.open-pr == 'false' && github.event_name == 'push' && github.ref_type == 'branch' }}
+# IF no open merge PR present AND push event AND ref type is branch -> runs
+# This rule has to be negated to be equivalent to GL workflow rules (1)!
+  run-rules-1:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -48,11 +63,14 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values: openpr: ${{ needs.check-pr.outputs.open-pr }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , ref name: ${{ github.ref_name }} ."
+          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} head ref: ${{ github.head_ref }} , ref name: ${{ github.ref_name }} ."
+          echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} ."
 
-  run-test-if-two:
-    needs: check-pr
-    if: ${{ needs.check-pr.outputs.regex-match == 'true' && github.event_name == 'push' }}
+# IF workflow rules are true AND tag is present on the latest commit AND push event -> runs
+# Translates to GL REPORTING rules (2)!
+  run-rules-2:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tag-run == 'true' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -60,4 +78,47 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values: openpr: ${{ needs.check-pr.outputs.regex-match }} , event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , ref name: ${{ github.ref_name }} ."
+          echo "Rules 2 matched."
+
+# IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match -> run
+# This would translate to PUBLISH-CPMAP and PROJECTS-PHASE1 rules (3)!
+  run-rules-3:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.head_ref == 'envvar' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Rules 3 matched."
+
+# IF commit branch is develop OR commit tag is regex match -> run
+# This would translate to PROJECTS-PHASE2 rules (4)!
+
+# IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match /
+# OR branch assoicated with commit AND not develop branch AND changes happen on paths /
+# OR Pull Request target branch is develop -> run
+# This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (5)!
+
+# IF commit message 'DEPLOYME' -> do NOT run
+# IF commit branch is develop OR commit tag is regex match -> run
+# This would translate to TEST:cpmap rules (6)!
+  run-rules-6:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.head_ref == 'envvar' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Rules 6 matched."
+
+# IF commit message 'DEPLOYME' -> do NOT run
+# IF commit tag is regex match -> do NOT run
+# IF commit branch is develop -> do NOT run
+# IF branch assoicated with commit AND changes happen on paths OR Pull Request target branch is develop -> run
+# This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (7)!
