@@ -63,7 +63,7 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} head ref: ${{ github.head_ref }} , ref name: ${{ github.ref_name }} ."
+          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , head ref: ${{ github.head_ref }} , ref name: ${{ github.ref_name }} ."
           echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} ."
 
 # IF workflow rules are true AND tag is present on the latest commit AND push event -> runs
@@ -84,7 +84,7 @@ jobs:
 # This would translate to PUBLISH-CPMAP and PROJECTS-PHASE1 rules (3)!
   run-rules-3:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.head_ref == 'envvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -107,7 +107,7 @@ jobs:
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.head_ref == 'envvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
