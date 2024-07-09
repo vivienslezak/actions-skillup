@@ -63,7 +63,7 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , head ref: ${{ github.head_ref }} , ref name: ${{ github.ref_name }} ."
+          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , head ref: ${{ github.head_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
           echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} ."
 
 # IF workflow rules are true AND tag is present on the latest commit AND push event -> runs
