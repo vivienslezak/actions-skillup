@@ -84,7 +84,7 @@ jobs:
 # This would translate to PUBLISH-CPMAP and PROJECTS-PHASE1 rules (3)!
   run-rules-3:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'noenvvar' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -107,7 +107,7 @@ jobs:
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'noenvvar' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
