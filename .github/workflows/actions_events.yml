@@ -84,7 +84,7 @@ jobs:
 # This would translate to PUBLISH-CPMAP and PROJECTS-PHASE1 rules (3)!
   run-rules-3:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'noenvvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -96,6 +96,17 @@ jobs:
 
 # IF commit branch is develop OR commit tag is regex match -> run
 # This would translate to PROJECTS-PHASE2 rules (4)!
+  run-rules-4:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Rules 4 matched."
 
 # IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match /
 # OR branch assoicated with commit AND not develop branch AND changes happen on paths /
@@ -107,7 +118,7 @@ jobs:
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'noenvvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
