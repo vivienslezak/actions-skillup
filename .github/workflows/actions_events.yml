@@ -128,10 +128,14 @@ jobs:
 
       - name: Run tests
         run: |
-          DIR_CHANGE=$(git diff --dirstat=files,0 HEAD^ HEAD | sed 's/^[0-9.]\+% //g')
-          echo "$DIR_CHANGE"
-          FILE_CHANGE=$(git diff --name-only HEAD^ HEAD)
-          echo "Checked files are: $FILE_CHANGE"
+          DIR_CHANGE=$(git diff --dirstat=files,0 HEAD^ HEAD | sed 's/^[0-9.]+% //g')
+          echo "Dir changed: $DIR_CHANGE"
+          GITLAB_DIR_CH=$(git diff --dirstat=files,0 HEAD^ HEAD | sed 's/^[0-9.]+% //g' | grep "\.gitlab/" | wc -l)
+          echo "Gitlab dir changed: $GITLAB_DIR_CH"
+#          MATCH_CHANGE=("cpmap/cpmap-keymanager" "cpmap" ".gitlab" "*.xml" "" ""
+#          for path in $DIR_CHANGE; do for match in ${MATCH_CHANGE[*]}; do echo $path | grep $match; done; done
+#          FILE_CHANGE=$(git diff --name-only HEAD^ HEAD)
+#          echo "Checked files are: $FILE_CHANGE"
           echo "Rules 5 matched."
 
 # WORKS
