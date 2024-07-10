@@ -128,6 +128,8 @@ jobs:
 
       - name: Run tests
         run: |
+          DIR_CHANGE=$(git diff --dirstat=files,0 HEAD^ HEAD | sed 's/^[0-9.]\+% //g')
+          echo "$DIR_CHANGE"
           FILE_CHANGE=$(git diff --name-only HEAD^ HEAD)
           echo "Checked files are: $FILE_CHANGE"
           echo "Rules 5 matched."
