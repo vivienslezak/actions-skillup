@@ -2,7 +2,7 @@ name: actions_events
 on:
   push:
     branches: [ envvar ]
-    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
+#    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}-${{ github.event_name }}
@@ -45,14 +45,15 @@ jobs:
           else
             echo "workflow-run=true" >> "$GITHUB_OUTPUT"
           fi
-
+# https://www.meziantou.net/executing-github-actions-jobs-or-steps-only-when-specific-files-change.htm
     outputs:
       open-pr: ${{ steps.set-open-pr.outputs.open-pr }}
       tag-run: ${{ steps.set-tag-run.outputs.tag-run }}
       workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run}}
 
-# IF no open merge PR present AND push event AND ref type is branch -> runs
-# This rule has to be negated to be equivalent to GL workflow rules (1)!
+# WORKS
+# IF no open merge PR present AND push event AND ref type is branch -> run
+# This rule is equivalent to GL workflow rules (1)!
   run-rules-1:
     needs: check-values
     if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
@@ -63,10 +64,11 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , head ref: ${{ github.head_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
+          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , opr head ref: ${{ github.head_ref }} , opr base ref: ${{ github.base_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
           echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} ."
 
-# IF workflow rules are true AND tag is present on the latest commit AND push event -> runs
+# WORKS
+# IF workflow rules are true AND tag is present on the latest commit AND push event -> run
 # Translates to GL REPORTING rules (2)!
   run-rules-2:
     needs: check-values
@@ -80,6 +82,7 @@ jobs:
         run: |
           echo "Rules 2 matched."
 
+# WORKS
 # IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match -> run
 # This would translate to PUBLISH-CPMAP and PROJECTS-PHASE1 rules (3)!
   run-rules-3:
@@ -94,6 +97,7 @@ jobs:
         run: |
           echo "Rules 3 matched."
 
+# WORKS
 # IF commit branch is develop OR commit tag is regex match -> run
 # This would translate to PROJECTS-PHASE2 rules (4)!
   run-rules-4:
@@ -102,7 +106,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+.        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
@@ -112,7 +116,23 @@ jobs:
 # OR branch assoicated with commit AND not develop branch AND changes happen on paths /
 # OR Pull Request target branch is develop -> run
 # This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (5)!
+  run-rules-5:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' ) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
+      - name: Run tests
+        run: |
+          FILE_CHANGE=$(git diff --name-only HEAD^ HEAD)
+          echo "Checked files are: $FILE_CHANGE"
+          echo "Rules 5 matched."
+
+# WORKS
 # IF commit message 'DEPLOYME' -> do NOT run
 # IF commit branch is develop OR commit tag is regex match -> run
 # This would translate to TEST:cpmap rules (6)!
