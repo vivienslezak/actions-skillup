@@ -128,7 +128,7 @@ jobs:
 
       - name: Run tests
         run: |
-          DIR_CHANGE=$(git diff --dirstat=files,0 HEAD^ HEAD | sed 's/^[0-9.]+% //g')
+          DIR_CHANGE=$(git diff --dirstat=files,0 HEAD^ HEAD | awk -F' ' '{print $2}')
           echo "Dir changed: $DIR_CHANGE"
           GITLAB_DIR_CH=$(git diff --dirstat=files,0 HEAD^ HEAD | sed 's/^[0-9.]+% //g' | grep "\.gitlab/" | wc -l)
           echo "Gitlab dir changed: $GITLAB_DIR_CH"
