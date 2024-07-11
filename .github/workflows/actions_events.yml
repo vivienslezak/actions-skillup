@@ -68,60 +68,43 @@ jobs:
           echo "cpmap-projects-mtu dir changed: $CPMAP_MTU_PROJECTS_CH"
           CPMAP_KEYMANAGER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/cpmap-keymanager/$" | wc -l)
           echo "cpmap-keymanager dir changed: $CPMAP_KEYMANAGER_CH"
-          CPMAP_TEST_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-aes-keymanager/$|^cpmap/cpmap-common/$|^cpmap/cpmap-keygenerator/$|^cpmap/cpmap-collector/$|^cpmap/cpmap-collector-offline/$|^cpmap/cpmap-mock-lem/$|^cpmap/cpmap-mock-source/$|^cpmap/cpmap-source-offline/$|^cpmap/cpmap-plugin/$" | wc -l)
-          echo "cpmap-test dir changed: $CPMAP_TEST_CH"
+          CPMAP_TEST_OTHER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-aes-keymanager/$|^cpmap/cpmap-common/$|^cpmap/cpmap-keygenerator/$|^cpmap/cpmap-collector/$|^cpmap/cpmap-collector-offline/$|^cpmap/cpmap-mock-lem/$|^cpmap/cpmap-mock-source/$|^cpmap/cpmap-source-offline/$|^cpmap/cpmap-plugin/$" | wc -l)
+          echo "cpmap-test-other dir changed: $CPMAP_TEST_CH"
           CPMAP_TEST_MAPPER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-mapper/$|^cpmap/cpmap-test-integration/$" | wc -l)
           echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
-          if [ "$GITLAB_CH" -ge "1" ]; then
-            echo "gitlab-ch=true" >> "$GITHUB_OUTPUT"
-            echo "if is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_CH" -ge "1" ] || [ "$CPMAP_KEYMANAGER_CH" -ge "1" ]; then
+            echo "test-cpmap-keymanager=true" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$ROOT_CH" -ge "1" ]; then
-            echo "root-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 1 is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_CH" -ge "1" ] || [ "$CPMAP_TEST_MAPPER_CH" -ge "1" ]; then
+            echo "test-mapper-integtest=true" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$CPMAP_CH" -ge "1" ]; then
-            echo "cpmap-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 2 is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_CH" -ge "1" ] || [ "$CPMAP_TEST_OTHER_CH" -ge "1" ]; then
+            echo "test-other-plugins=true" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$CPMAP_PROJECTS_CH" -ge "1" ]; then
-            echo "cpmap-projects-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 3 is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_PROJECTS_CH" -ge "1" ] || [ "$CPMAP_NAVU_PROJECTS_CH" -ge "1" ]; then
+            echo "build-navu-cpmap=true" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$CPMAP_NAVU_PROJECTS_CH" -ge "1" ]; then
-            echo "cpmap-navu-projects-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 4 is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_PROJECTS_CH" -ge "1" ] || [ "$CPMAP_MTU_PROJECTS_CH" -ge "1" ]; then
+            echo "build-mtu-cpmap=true" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$CPMAP_MTU_PROJECTS_CH" -ge "1" ]; then
-            echo "cpmap-mtu-projects-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 5 is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$CPMAP_NAVU_PROJECTS_CH" -ge "1" ]; then
+            echo "verify-navu-cpmap=true" >> "$GITHUB_OUTPUT"
           fi
-          if [ "$CPMAP_KEYMANAGER_CH" -ge "1" ]; then
-            echo "cpmap-keymanager-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 6 is true"
-          fi
-          if [ "$CPMAP_TEST_CH" -ge "1" ]; then
-            echo "cpmap-test-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 7 is true"
-          fi
-          if [ "$CPMAP_TEST_MAPPER_CH" -ge "1" ]; then
-            echo "cpmap-test-mapper-ch=true" >> "$GITHUB_OUTPUT"
-            echo "elif 8 is true"
+          if [ "$GITLAB_CH" -ge "1" ] || [ "$CPMAP_MTU_PROJECTS_CH" -ge "1" ]; then
+            echo "verify-mtu-cpmap=true" >> "$GITHUB_OUTPUT"
           fi
 
     outputs:
       open-pr: ${{ steps.set-open-pr.outputs.open-pr }}
       tag-run: ${{ steps.set-tag-run.outputs.tag-run }}
       workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run }}
-      gitlab-ch: ${{ steps.set-dir-change.outputs.gitlab-ch }}
-      root-ch: ${{ steps.set-dir-change.outputs.root-ch }}
-      cpmap-ch: ${{ steps.set-dir-change.outputs.cpmap-ch }}
-      cpmap-projects-ch: ${{ steps.set-dir-change.outputs.cpmap-projects-ch }}
-      cpmap-navu-projects-ch: ${{ steps.set-dir-change.outputs.cpmap-navu-projects-ch }}
-      cpmap-mtu-projects-ch: ${{ steps.set-dir-change.outputs.cpmap-mtu-projects-ch }}
-      cpmap-keymanager-ch: ${{ steps.set-dir-change.outputs.cpmap-keymanager-ch }}
-      cpmap-test-ch: ${{ steps.set-dir-change.outputs.cpmap-test-ch }}
-      cpmap-test-mapper-ch: ${{ steps.set-dir-change.outputs.cpmap-test-mapper-ch }}
+      test-cpmap-keymanager: ${{ steps.set-dir-change.outputs.test-cpmap-keymanager }}
+      test-mapper-integtest: ${{ steps.set-dir-change.outputs.test-mapper-integtest }}
+      test-other-plugins: ${{ steps.set-dir-change.outputs.test-other-plugins }}
+      build-navu-cpmap: ${{ steps.set-dir-change.outputs.build-navu-cpmap }}
+      build-mtu-cpmap: ${{ steps.set-dir-change.outputs.build-mtu-cpmap }}
+      verify-navu-cpmap: ${{ steps.set-dir-change.outputs.verify-navu-cpmap }}
+      verify-mtu-cpmap: ${{ steps.set-dir-change.outputs.verify-mtu-cpmap }}
 
 # WORKS
 # IF no open merge PR present AND push event AND ref type is branch -> run
@@ -188,9 +171,9 @@ jobs:
 # OR branch assoicated with commit AND not develop branch AND changes happen on paths /
 # OR Pull Request target branch is develop -> run
 # This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (5)!
-  run-rules-5:
+  run-rules-5-test-cpmap-keymanager:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true' ) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -198,7 +181,7 @@ jobs:
 
       - name: Run tests
         run: |
-          echo "gitlab dir: ${{ needs.check-values.outputs.gitlab-ch }} , root dir: ${{ needs.check-values.outputs.root-ch }} , cpmap dir: ${{ needs.check-values.outputs.cpmap-ch }} , cpmap-projects dir: ${{ needs.check-values.outputs.cpmap-projects-ch }} , cpmap-navu dir: ${{ needs.check-values.outputs.cpmap-navu-projects-ch }} , cpmap-mtu dir: ${{ needs.check-values.outputs.cpmap-mtu-projects-ch }} , cpmap-keymanager dir: ${{ needs.check-values.outputs.cpmap-keymanager-ch }} , cpmap-test dir: ${{ needs.check-values.outputs.cpmap-test-ch }} , cpmap-test mapper dir: ${{ needs.check-values.outputs.cpmap-test-mapper-ch }} ."
+          echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
           echo "Rules 5 matched."
 
 # WORKS
@@ -221,4 +204,4 @@ jobs:
 # IF commit tag is regex match -> do NOT run
 # IF commit branch is develop -> do NOT run
 # IF branch assoicated with commit AND changes happen on paths OR Pull Request target branch is develop -> run
-# This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (7)!
+# This would translate to TEST:common-keygen-collector-aes-lem-source-plugin and TEST:mapper-integtest and TEST-CPMAP-KEYMANAGER rules (7)!
