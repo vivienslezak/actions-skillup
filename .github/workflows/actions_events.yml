@@ -56,9 +56,9 @@ jobs:
       - name: Set dir-change output
         id: set-dir-change
         run: |
-          ROOT_CH=$(git diff --name-only HEAD~1 HEAD | grep -v "/" | grep -v "README.md" | grep -v "changelog.txt" | grep -v ".version" | wc -l)
+          ROOT_CH=$(git diff --name-only HEAD^ HEAD | grep -v "/" | grep -v "README.md" | grep -v "changelog.txt" | grep -v ".version" | wc -l)
           echo "files changed in root: $ROOT_CH"
-          GITLAB_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^\.gitlab/" | wc -l)
+          GITLAB_CH=$(git diff --dirstat=files,0 HEAD^ HEAD | awk -F' ' '{print $2}' | grep "^\.gitlab/" | wc -l)
           echo "Gitlab dir changed: $GITLAB_CH"
           CPMAP_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/$" | wc -l)
           echo "cpmap dir changed: $CPMAP_CH"
@@ -185,6 +185,12 @@ jobs:
 
       - name: Run tests
         run: |
+          ROOT_CH=$(git diff --name-only HEAD^ HEAD | grep -v "/" | grep -v "README.md" | grep -v "changelog.txt" | grep -v ".version" | wc -l)
+          echo "files changed in root: $ROOT_CH"
+          GITLAB_CH=$(git diff --dirstat=files,0 HEAD^ HEAD | awk -F' ' '{print $2}' | grep "^\.gitlab/" | wc -l)
+          echo "Gitlab dir changed: $GITLAB_CH"
+          CPMAP_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/$" | wc -l)
+          echo "cpmap dir changed: $CPMAP_CH"
           echo "gitlab dir: ${{ needs.check-values.outputs.gitlab-ch }} , root dir: ${{ needs.check-values.outputs.root-ch }} , cpmap dir: ${{ needs.check-values.outputs.cpmap-ch }} , cpmap-projects dir: ${{ needs.check-values.outputs.cpmap-projects-ch }} , cpmap-navu dir: ${{ needs.check-values.outputs.cpmap-navu-projects-ch }} , cpmap-mtu dir: ${{ needs.check-values.outputs.cpmap-mtu-projects-ch }} , cpmap-keymanager dir: ${{ needs.check-values.outputs.cpmap-keymanager-ch }} , cpmap-test common dir: ${{ needs.check-values.outputs.cpmap-test-common-ch }} , cpmap-test mapper dir: ${{ needs.check-values.outputs.cpmap-test-mapper-ch }} ."
           echo "Rules 5 matched."
 
