@@ -75,6 +75,7 @@ jobs:
           if [ "$GITLAB_CH" -ge "1" ]; then
             echo "gitlab-ch=true" >> "$GITHUB_OUTPUT"
             echo "if is true"
+          fi
           if [ "$ROOT_CH" -ge "1" ]; then
             echo "root-ch=true" >> "$GITHUB_OUTPUT"
             echo "elif 1 is true"
