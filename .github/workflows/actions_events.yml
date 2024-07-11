@@ -45,11 +45,61 @@ jobs:
           else
             echo "workflow-run=true" >> "$GITHUB_OUTPUT"
           fi
-# https://www.meziantou.net/executing-github-actions-jobs-or-steps-only-when-specific-files-change.htm
+
+      - name: Set dir-change output
+        id: set-dir-change
+        run: |
+          ROOT_CH=$(git diff --name-only HEAD~1 HEAD | grep -v "/" | grep -v "README.md" | grep -v "changelog.txt" | grep -v ".version" | wc -l)
+          echo "files changed in root: $ROOT_CH"
+          GITLAB_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^\.gitlab/" | wc -l)
+          echo "Gitlab dir changed: $GITLAB_CH"
+          CPMAP_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/$" | wc -l)
+          echo "cpmap dir changed: $CPMAP_CH"
+          CPMAP_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap-projects/$" | wc -l)
+          echo "cpmap-projects dir changed: $CPMAP_PROJECTS_CH"
+          CPMAP_NAVU_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap-projects/navu-cpmap/$" | wc -l)
+          echo "cpmap-projects-navu dir changed: $CPMAP_NAVU_PROJECTS_CH"
+          CPMAP_MTU_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap-projects/mtu-cpmap/$" | wc -l)
+          echo "cpmap-projects-mtu dir changed: $CPMAP_MTU_PROJECTS_CH"
+          CPMAP_KEYMANAGER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/cpmap-keymanager/$" | wc -l)
+          echo "cpmap-keymanager dir changed: $CPMAP_KEYMANAGER_CH"
+          CPMAP_TEST_COMMON_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-aes-keymanager/$|^cpmap/cpmap-common/$|^cpmap/cpmap-keygenerator/$|^cpmap/cpmap-collector/$|^cpmap/cpmap-collector-offline/$|^cpmap/cpmap-mock-lem/$|^cpmap/cpmap-mock-source/$|^cpmap/cpmap-source-offline/$|^cpmap/cpmap-plugin/$" | wc -l)
+          echo "cpmap-test-common dir changed: $CPMAP_TEST_COMMON_CH"
+          CPMAP_TEST_MAPPER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-mapper/$|^cpmap/cpmap-test-integration/$" | wc -l)
+          echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
+          if [ "$GITLAB_CH" -ge "1" ]; then
+            echo "gitlab-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$ROOT_CH" -ge "1" ]; then
+            echo "root-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_CH" -ge "1" ]; then
+            echo "cpmap-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_PROJECTS_CH" -ge "1" ]; then
+            echo "cpmap-projects-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_NAVU_PROJECTS_CH" -ge "1" ]; then
+            echo "cpmap-navu-projects-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_MTU_PROJECTS_CH" -ge "1" ]; then
+            echo "cpmap-mtu-projects-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_KEYMANAGER_CH" -ge "1" ]; then
+            echo "cpmap-keymanager-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_TEST_COMMON_CH" -ge "1" ]; then
+            echo "cpmap-test-common-ch=true" >> "$GITHUB_OUTPUT"
+          elif [ "$CPMAP_TEST_MAPPER_CH" -ge "1" ]; then
+            echo "cpmap-test-mapper-ch=true" >> "$GITHUB_OUTPUT"
+          fi
+
     outputs:
       open-pr: ${{ steps.set-open-pr.outputs.open-pr }}
       tag-run: ${{ steps.set-tag-run.outputs.tag-run }}
-      workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run}}
+      workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run }}
+      gitlab-ch: ${{ steps.set-dir-change.outputs.gitlab-ch }}
+      root-ch: ${{ steps.set-dir-change.outputs.root-ch }}
+      cpmap-ch: ${{ steps.set-dir-change.outputs.cpmap-ch }}
+      cpmap-projects-ch: ${{ steps.set-dir-change.outputs.cpmap-projects-ch }}
+      cpmap-navu-projects-ch: ${{ steps.set-dir-change.outputs.cpmap-navu-projects-ch }}
+      cpmap-mtu-projects-ch: ${{ steps.set-dir-change.outputs.cpmap-mtu-projects-ch }}
+      cpmap-keymanager-ch: ${{ steps.set-dir-change.outputs.cpmap-keymanager-ch }}
+      cpmap-test-common-ch: ${{ steps.set-dir-change.outputs.cpmap-test-common-ch }}
+      cpmap-test-mapper-ch: ${{ steps.set-dir-change.outputs.cpmap-test-mapper-ch }}
 
 # WORKS
 # IF no open merge PR present AND push event AND ref type is branch -> run
@@ -128,30 +178,7 @@ jobs:
 
       - name: Run tests
         run: |
-          DIR_CHANGE=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}')
-          echo "Dir changed: $DIR_CHANGE"
-          ROOT_CH=$(git diff --name-only HEAD~1 HEAD | grep -v "/" | grep -v "README.md" | grep -v "changelog.txt" | grep -v ".version" | wc -l)
-          echo "files changed in root: $ROOT_CH"
-          GITLAB_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | sed awk -F' ' '{print $2}' | grep "\.gitlab/" | wc -l)
-          echo "Gitlab dir changed: $GITLAB_CH"
-          CPMAP_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "cpmap/$" | wc -l)
-          echo "cpmap dir changed: $CPMAP_CH"
-          CPMAP_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "cpmap-projects/$" | wc -l)
-          echo "cpmap-projects dir changed: $CPMAP_PROJECTS_CH"
-          CPMAP_NAVU_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "cpmap-projects/navu-cpmap/$" | wc -l)
-          echo "cpmap-projects-navu dir changed: $CPMAP_NAVU_PROJECTS_CH"
-          CPMAP_MTU_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "cpmap-projects/mtu-cpmap/$" | wc -l)
-          echo "cpmap-projects-mtu dir changed: $CPMAP_MTU_PROJECTS_CH"
-          CPMAP_KEYMANAGER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "cpmap/cpmap-keymanager/$" | wc -l)
-          echo "cpmap-keymanager dir changed: $CPMAP_KEYMANAGER_CH"
-          CPMAP_TEST_COMMON_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "cpmap/cpmap-aes-keymanager/$|cpmap/cpmap-common/$|cpmap/cpmap-keygenerator/$|cpmap/cpmap-collector/$|cpmap/cpmap-collector-offline/$|cpmap/cpmap-mock-lem/$|cpmap/cpmap-mock-source/$|cpmap/cpmap-source-offline/$|cpmap/cpmap-plugin/$" | wc -l)
-          echo "cpmap-test-common dir changed: $CPMAP_TEST_COMMON_CH"
-          CPMAP_TEST_MAPPER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "cpmap/cpmap-mapper/$|cpmap/cpmap-test-integration/$" | wc -l)
-          echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
-          # MATCH_CHANGE=("cpmap/cpmap-keymanager" "cpmap" ".gitlab" "*.xml" "" ""
-          # for path in $DIR_CHANGE; do for match in ${MATCH_CHANGE[*]}; do echo $path | grep $match; done; done
-          # FILE_CHANGE=$(git diff --name-only HEAD^ HEAD)
-          # echo "Checked files are: $FILE_CHANGE"
+          echo "gitlab dir: ${{ needs.check-values.outputs.gitlab-ch }} , root dir: ${{ needs.check-values.outputs.root-ch }} , cpmap dir: ${{ needs.check-values.outputs.cpmap-ch }} , cpmap-projects dir: ${{ needs.check-values.outputs.cpmap-projects-ch }} , cpmap-navu dir: ${{ needs.check-values.outputs.cpmap-navu-projects-ch }} , cpmap-mtu dir: ${{ needs.check-values.outputs.cpmap-mtu-projects-ch }} , cpmap-keymanager dir: ${{ needs.check-values.outputs.cpmap-keymanager-ch }} , cpmap-test common dir: ${{ needs.check-values.outputs.cpmap-test-common-ch }} , cpmap-test mapper dir: ${{ needs.check-values.outputs.cpmap-test-mapper-ch }} ."
           echo "Rules 5 matched."
 
 # WORKS
