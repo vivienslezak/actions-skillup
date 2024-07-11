@@ -9,16 +9,17 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  checkout-repo:
+#  checkout-repo:
+#    runs-on: ubuntu-latest
+#    steps:
+
+  check-values:
+#    needs: checkout-repo
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-  check-values:
-    needs: checkout-repo
-    runs-on: ubuntu-latest
-    steps:
       - name: Set open-pr output
         id: set-open-pr
         run: |
