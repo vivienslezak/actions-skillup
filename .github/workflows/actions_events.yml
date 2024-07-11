@@ -69,7 +69,7 @@ jobs:
           CPMAP_KEYMANAGER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/cpmap-keymanager/$" | wc -l)
           echo "cpmap-keymanager dir changed: $CPMAP_KEYMANAGER_CH"
           CPMAP_TEST_OTHER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-aes-keymanager/$|^cpmap/cpmap-common/$|^cpmap/cpmap-keygenerator/$|^cpmap/cpmap-collector/$|^cpmap/cpmap-collector-offline/$|^cpmap/cpmap-mock-lem/$|^cpmap/cpmap-mock-source/$|^cpmap/cpmap-source-offline/$|^cpmap/cpmap-plugin/$" | wc -l)
-          echo "cpmap-test-other dir changed: $CPMAP_TEST_CH"
+          echo "cpmap-test-other dir changed: $CPMAP_TEST_OTHER_CH"
           CPMAP_TEST_MAPPER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-mapper/$|^cpmap/cpmap-test-integration/$" | wc -l)
           echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
           if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_CH" -ge "1" ] || [ "$CPMAP_KEYMANAGER_CH" -ge "1" ]; then
