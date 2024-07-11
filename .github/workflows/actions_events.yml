@@ -9,7 +9,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  checkout-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
   check-values:
+    needs: checkout-repo
     runs-on: ubuntu-latest
     steps:
       - name: Set open-pr output
@@ -109,8 +116,8 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
