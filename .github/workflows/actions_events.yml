@@ -22,7 +22,7 @@ jobs:
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
-          echo "$OPEN_PR_COUNT"
+          #echo "$OPEN_PR_COUNT"
           if [ "$OPEN_PR_COUNT" -eq "0" ]; then
             echo "open-pr=false" >> "$GITHUB_OUTPUT"
           else
@@ -51,27 +51,35 @@ jobs:
             echo "workflow-run=true" >> "$GITHUB_OUTPUT"
           fi
 
+# SET when never outputs to have a workaround for when: never, or check the web for a solution that is GH ready?
+#      - name: Set when-never output
+#        id: set-when-never
+#        run: |
+#          if [[ ${{ github.event.head_commit.message }} == 'DEPLOYME' ]]; then
+#            echo "when-never=true"
+#          fi
+
       - name: Set dir-change output
         id: set-dir-change
         run: |
           ROOT_CH=$(git diff --name-only HEAD~1 HEAD | grep -v "/" | grep -v "README.md" | grep -v "changelog.txt" | grep -v ".version" | wc -l)
-          echo "files changed in root: $ROOT_CH"
+          #echo "files changed in root: $ROOT_CH"
           GITLAB_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^\.gitlab/" | wc -l)
-          echo "Gitlab dir changed: $GITLAB_CH"
+          #echo "Gitlab dir changed: $GITLAB_CH"
           CPMAP_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/$" | wc -l)
-          echo "cpmap dir changed: $CPMAP_CH"
+          #echo "cpmap dir changed: $CPMAP_CH"
           CPMAP_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap-projects/$" | wc -l)
-          echo "cpmap-projects dir changed: $CPMAP_PROJECTS_CH"
+          #echo "cpmap-projects dir changed: $CPMAP_PROJECTS_CH"
           CPMAP_NAVU_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap-projects/navu-cpmap/" | wc -l)
-          echo "cpmap-projects-navu dir changed: $CPMAP_NAVU_PROJECTS_CH"
+          #echo "cpmap-projects-navu dir changed: $CPMAP_NAVU_PROJECTS_CH"
           CPMAP_MTU_PROJECTS_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap-projects/mtu-cpmap/" | wc -l)
-          echo "cpmap-projects-mtu dir changed: $CPMAP_MTU_PROJECTS_CH"
+          #echo "cpmap-projects-mtu dir changed: $CPMAP_MTU_PROJECTS_CH"
           CPMAP_KEYMANAGER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep "^cpmap/cpmap-keymanager/" | wc -l)
-          echo "cpmap-keymanager dir changed: $CPMAP_KEYMANAGER_CH"
+          #echo "cpmap-keymanager dir changed: $CPMAP_KEYMANAGER_CH"
           CPMAP_TEST_OTHER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-aes-keymanager/|^cpmap/cpmap-common/|^cpmap/cpmap-keygenerator/|^cpmap/cpmap-collector/|^cpmap/cpmap-collector-offline/|^cpmap/cpmap-mock-lem/|^cpmap/cpmap-mock-source/|^cpmap/cpmap-source-offline/|^cpmap/cpmap-plugin/" | wc -l)
-          echo "cpmap-test-other dir changed: $CPMAP_TEST_OTHER_CH"
+          #echo "cpmap-test-other dir changed: $CPMAP_TEST_OTHER_CH"
           CPMAP_TEST_MAPPER_CH=$(git diff --dirstat=files,0 HEAD~1 HEAD | awk -F' ' '{print $2}' | grep -E "^cpmap/cpmap-mapper/|^cpmap/cpmap-test-integration/$" | wc -l)
-          echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
+          #echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
           if [ "$GITLAB_CH" -ge "1" ] || [ "$ROOT_CH" -ge "1" ] || [ "$CPMAP_CH" -ge "1" ] || [ "$CPMAP_KEYMANAGER_CH" -ge "1" ]; then
             echo "test-cpmap-keymanager=true" >> "$GITHUB_OUTPUT"
           fi
@@ -130,8 +138,8 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tag-run == 'true' && github.event_name == 'push' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
@@ -145,8 +153,8 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
@@ -160,61 +168,25 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
           echo "Rules 4 matched."
 
+#WORKS
 # IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match /
 # OR branch assoicated with commit AND not develop branch AND changes happen on paths /
 # OR Pull Request target branch is develop -> run
 # This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (5)!
-  run-rules-5-test-cpmap-keymanager:
-    needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true' ) }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
-        run: |
-          #echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
-          echo "Rules 5 test-cpmap-keymanager matched."
-
-  run-rules-5-test-mapper-integtest:
-    needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-mapper-integtest == 'true' ) }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
-        run: |
-          echo "Rules 5 test-mapper-integtest matched."
-
-  run-rules-5-test-other-plugins:
-    needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-other-plugins == 'true' ) }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run tests
-        run: |
-          echo "Rules 5 test-other-plugins matched."
-
   run-rules-5-build-navu-cpmap:
     needs: check-values
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-navu-cpmap == 'true' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
@@ -225,8 +197,8 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-mtu-cpmap == 'true' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
@@ -237,8 +209,8 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-navu-cpmap == 'true' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
@@ -249,31 +221,71 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-mtu-cpmap == 'true' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
           echo "Rules 5 verify-mtu-cpmap matched."
 
-# WORKS
+# NEEDS DEPLOYME NOT RUN!!!
+#
 # IF commit message 'DEPLOYME' -> do NOT run
 # IF commit branch is develop OR commit tag is regex match -> run
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar' ) }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+#      - name: Checkout code
+#        uses: actions/checkout@v4
 
       - name: Run tests
         run: |
           echo "Rules 6 matched."
 
+# NEEDS DEPLOYME, tag and branch NOT RUN!!!
+#
 # IF commit message 'DEPLOYME' -> do NOT run
 # IF commit tag is regex match -> do NOT run
 # IF commit branch is develop -> do NOT run
 # IF branch assoicated with commit AND changes happen on paths OR Pull Request target branch is develop -> run
 # This would translate to TEST:common-keygen-collector-aes-lem-source-plugin and TEST:mapper-integtest and TEST-CPMAP-KEYMANAGER rules (7)!
+  run-rules-7-test-cpmap-keymanager:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true' ) }}
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          #echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
+          echo "Rules 7 test-cpmap-keymanager matched."
+
+  run-rules-7-test-mapper-integtest:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-mapper-integtest == 'true' ) }}
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Rules 7 test-mapper-integtest matched."
+
+  run-rules-7-test-other-plugins:
+    needs: check-values
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.test-other-plugins == 'true' ) }}
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+
+      - name: Run tests
+        run: |
+          echo "Rules 7 test-other-plugins matched."
+
