@@ -74,22 +74,31 @@ jobs:
           echo "cpmap test-mapper changed: $CPMAP_TEST_MAPPER_CH"
           if [ "$GITLAB_CH" -ge "1" ]; then
             echo "gitlab-ch=true" >> "$GITHUB_OUTPUT"
+            echo "if is true"
           elif [ "$ROOT_CH" -ge "1" ]; then
             echo "root-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 1 is true"
           elif [ "$CPMAP_CH" -ge "1" ]; then
             echo "cpmap-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 2 is true"
           elif [ "$CPMAP_PROJECTS_CH" -ge "1" ]; then
             echo "cpmap-projects-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 3 is true"
           elif [ "$CPMAP_NAVU_PROJECTS_CH" -ge "1" ]; then
             echo "cpmap-navu-projects-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 4 is true"
           elif [ "$CPMAP_MTU_PROJECTS_CH" -ge "1" ]; then
             echo "cpmap-mtu-projects-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 5 is true"
           elif [ "$CPMAP_KEYMANAGER_CH" -ge "1" ]; then
             echo "cpmap-keymanager-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 6 is true"
           elif [ "$CPMAP_TEST_COMMON_CH" -ge "1" ]; then
             echo "cpmap-test-common-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 7 is true"
           elif [ "$CPMAP_TEST_MAPPER_CH" -ge "1" ]; then
             echo "cpmap-test-mapper-ch=true" >> "$GITHUB_OUTPUT"
+            echo "elif 8 is true"
           fi
 
     outputs:
