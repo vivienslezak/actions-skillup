@@ -111,7 +111,7 @@ jobs:
 # This rule is equivalent to GL workflow rules (1)!
   run-rules-1:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
+/    if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -119,6 +119,7 @@ jobs:
 
       - name: Run tests
         run: |
+          echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
           echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , opr head ref: ${{ github.head_ref }} , opr base ref: ${{ github.base_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
           echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} ."
 
@@ -254,7 +255,6 @@ jobs:
 
       - name: Run tests
         run: |
-          #echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
           echo "Rules 7 test-cpmap-keymanager matched."
 
   run-rules-7-test-mapper-integtest:
