@@ -22,11 +22,13 @@ jobs:
         run: |
           OPEN_PR_COUNT=$(curl -s -H "Authorization: token ${{ secrets.TEST_TOKEN }}" \
             "https://api.github.com/repos/${{ github.repository }}/pulls" | grep '\"state\"\: \"open\"' | wc -l)
-          #echo "$OPEN_PR_COUNT"
+          echo "$OPEN_PR_COUNT"
           if [ "$OPEN_PR_COUNT" -ge "1" ]; then
             echo "open-pr=true" >> "$GITHUB_OUTPUT"
+            echo "value if ge 1: $GITHUB_OUTPUT"
           else
             echo "open-pr=false" >> "$GITHUB_OUTPUT"
+            echo "value if eq 0: $GITHUB_OUTPUT"
           fi
 
       - name: Set tag-run output
@@ -47,8 +49,10 @@ jobs:
         run: |
           if [[ ${{ steps.set-open-pr.outputs.open-pr }} == 'false' ]] && [[ ${{ github.event_name }} != 'push' ]] && [[ ${{ github.ref_type }} != 'branch' ]]; then
             echo "workflow-run=true" >> "$GITHUB_OUTPUT"
+            echo "value if open-pr false, not push or branch: $GITHUB_OUTPUT"
           else
             echo "workflow-run=false" >> "$GITHUB_OUTPUT"
+            echo "value otherwise $GITHUB_OUTPUT"
           fi
 
       - name: Set dir-change output
