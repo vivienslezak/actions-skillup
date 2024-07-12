@@ -168,7 +168,7 @@ jobs:
         run: |
           echo "Rules 4 matched."
 
-#WORKS
+# WORKS
 # IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match /
 # OR branch assoicated with commit AND not develop branch AND changes happen on paths /
 # OR Pull Request target branch is develop -> run
@@ -221,8 +221,7 @@ jobs:
         run: |
           echo "Rules 5 verify-mtu-cpmap matched."
 
-# NEEDS DEPLOYME NOT RUN!!!
-#
+# WORKS
 # IF commit message 'DEPLOYME' -> do NOT run
 # IF commit branch is develop OR commit tag is regex match -> run
 # This would translate to TEST:cpmap rules (6)!
@@ -238,8 +237,7 @@ jobs:
         run: |
           echo "Rules 6 matched."
 
-# NEEDS DEPLOYME, tag and branch NOT RUN!!!
-#
+# WORKS
 # IF commit message 'DEPLOYME' -> do NOT run
 # IF commit tag is regex match -> do NOT run
 # IF commit branch is develop -> do NOT run
