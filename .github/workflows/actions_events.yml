@@ -50,6 +50,15 @@ jobs:
             echo "workflow-run=true" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Set tests-run output
+        id: set-tests-run
+        run: |
+          if [[ ${{ github.event.head_commit.message }} == 'DEPLOYME' ]] || [[ ${{ needs.check-values.outputs.tag-run }} == 'true' ]] || [[ ${{ github.ref_name }} == 'envvar' ]]; then
+            echo "tests-run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "tests-run=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Set dir-change output
         id: set-dir-change
         run: |
@@ -97,6 +106,7 @@ jobs:
       open-pr: ${{ steps.set-open-pr.outputs.open-pr }}
       tag-run: ${{ steps.set-tag-run.outputs.tag-run }}
       workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run }}
+      tests-run: ${{ steps.set-tests-run.outputs.tests-run }}
       test-cpmap-keymanager: ${{ steps.set-dir-change.outputs.test-cpmap-keymanager }}
       test-mapper-integtest: ${{ steps.set-dir-change.outputs.test-mapper-integtest }}
       test-other-plugins: ${{ steps.set-dir-change.outputs.test-other-plugins }}
@@ -244,7 +254,8 @@ jobs:
 # This would translate to TEST:common-keygen-collector-aes-lem-source-plugin and TEST:mapper-integtest and TEST-CPMAP-KEYMANAGER rules (7)!
   run-rules-7-test-cpmap-keymanager:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'false' || github.event.head_commit.message != 'DEPLOYME' || github.ref_name != 'envvar') && (github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
+#    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'false' || github.event.head_commit.message != 'DEPLOYME' || github.ref_name != 'envvar') && (github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && (github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
