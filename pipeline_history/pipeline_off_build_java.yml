@@ -1,0 +1,27 @@
+name: build_java
+on:
+  push:
+    branches: [ envvar ]
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+      - name: 'Set up Java Environment'
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '11.0.16'
+      - name: 'Build Java Application'
+        run: |
+         ./gradlew :spotlessApply
+         ./gradlew build
+      - name: 'Upload Artifact'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ secrets.JAVA_JAR_NAME }}
+          path: build/libs/*
+          if-no-files-found: error
+      - name: 'List all environment variables'
+        run: env
