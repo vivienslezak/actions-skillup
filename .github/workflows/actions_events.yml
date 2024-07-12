@@ -1,7 +1,7 @@
 name: actions_events
-on:
-  push:
-    branches: [ envvar ]
+on: push
+#  push:
+#    branches: [ envvar ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -54,10 +54,8 @@ jobs:
         id: set-deploy-run
         run: |
           DEPLOY_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
-          if [ "$DEPLOY_MESSAGE" -qe "1" ]; then
+          if [ "$DEPLOY_MESSAGE" -ge "1" ]; then
             echo "deploy-run=true" >> "$GITHUB_OUTPUT"
-            echo "$DEPLOY_MESSAGE"
-            echo "${{ github.event.head_commit.message }} | grep 'DEPLOYME$'"
           else
             echo "deploy-run=false" >> "$GITHUB_OUTPUT"
           fi
@@ -118,6 +116,7 @@ jobs:
       open-pr: ${{ steps.set-open-pr.outputs.open-pr }}
       tag-run: ${{ steps.set-tag-run.outputs.tag-run }}
       workflow-run: ${{ steps.set-workflow-run.outputs.workflow-run }}
+      deploy-run: ${{ steps.set-deploy-run.outputs.deploy-run }}
       tests-run: ${{ steps.set-tests-run.outputs.tests-run }}
       test-cpmap-keymanager: ${{ steps.set-dir-change.outputs.test-cpmap-keymanager }}
       test-mapper-integtest: ${{ steps.set-dir-change.outputs.test-mapper-integtest }}
@@ -142,7 +141,7 @@ jobs:
         run: |
           echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
           echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , opr head ref: ${{ github.head_ref }} , opr base ref: ${{ github.base_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
-          echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} ."
+          echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} , deploy-run: ${{ needs.check-values.outputs.deploy-run }} ."
 
 # WORKS
 # IF workflow rules are true AND tag is present on the latest commit AND push event -> run
@@ -164,7 +163,7 @@ jobs:
 # This would translate to PUBLISH-CPMAP and PROJECTS-PHASE1 rules (3)!
   run-rules-3:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -196,7 +195,7 @@ jobs:
 # This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (5)!
   run-rules-5-build-navu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-navu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-navu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -208,7 +207,7 @@ jobs:
 
   run-rules-5-build-mtu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-mtu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-mtu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -220,7 +219,7 @@ jobs:
 
   run-rules-5-verify-navu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-navu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-navu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -232,7 +231,7 @@ jobs:
 
   run-rules-5-verify-mtu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || github.event.head_commit.message == 'DEPLOYME' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-mtu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-mtu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -248,7 +247,7 @@ jobs:
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && github.event.head_commit.message != 'DEPLOYME' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.deploy-run == 'false' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
