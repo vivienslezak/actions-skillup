@@ -111,7 +111,7 @@ jobs:
 # This rule is equivalent to GL workflow rules (1)!
   run-rules-1:
     needs: check-values
-/    if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
