@@ -292,9 +292,6 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && ( github.base_ref == 'envvar' || needs.check-values.outputs.test-other-plugins == 'true') }}
     runs-on: ubuntu-latest
     steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
-
       - name: Run tests
         run: |
           echo "Rules 7 test-other-plugins matched."
