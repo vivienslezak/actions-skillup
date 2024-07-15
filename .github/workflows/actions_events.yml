@@ -247,7 +247,7 @@ jobs:
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.deploy-run == 'false' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.deploy-run == 'false' || needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -265,7 +265,7 @@ jobs:
 # This would translate to TEST:common-keygen-collector-aes-lem-source-plugin and TEST:mapper-integtest and TEST-CPMAP-KEYMANAGER rules (7)!
   run-rules-7-test-cpmap-keymanager:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && (github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tests-run == 'true' || github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -277,7 +277,7 @@ jobs:
 
   run-rules-7-test-mapper-integtest:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && (github.base_ref == 'envvar' || needs.check-values.outputs.test-mapper-integtest == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tests-run == 'true' || github.base_ref == 'envvar' || needs.check-values.outputs.test-mapper-integtest == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -289,7 +289,7 @@ jobs:
 
   run-rules-7-test-other-plugins:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && (github.base_ref == 'envvar' || needs.check-values.outputs.test-other-plugins == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tests-run == 'true' || github.base_ref == 'envvar' || needs.check-values.outputs.test-other-plugins == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
