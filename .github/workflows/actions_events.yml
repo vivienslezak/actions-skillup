@@ -141,7 +141,7 @@ jobs:
         run: |
           echo "test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
           echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , opr head ref: ${{ github.head_ref }} , opr base ref: ${{ github.base_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
-          echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} , deploy-run: ${{ needs.check-values.outputs.deploy-run }} ."
+          echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} , deploy-run: ${{ needs.check-values.outputs.deploy-run }} , tests-run: ${{ needs.check-values.outputs.tests-run }} ."
 
 # WORKS
 # IF workflow rules are true AND tag is present on the latest commit AND push event -> run
@@ -265,7 +265,7 @@ jobs:
 # This would translate to TEST:common-keygen-collector-aes-lem-source-plugin and TEST:mapper-integtest and TEST-CPMAP-KEYMANAGER rules (7)!
   run-rules-7-test-cpmap-keymanager:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tests-run == 'true' || github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && ( github.base_ref == 'envvar' || needs.check-values.outputs.test-cpmap-keymanager == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -277,7 +277,7 @@ jobs:
 
   run-rules-7-test-mapper-integtest:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tests-run == 'true' || github.base_ref == 'envvar' || needs.check-values.outputs.test-mapper-integtest == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && ( github.base_ref == 'envvar' || needs.check-values.outputs.test-mapper-integtest == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
