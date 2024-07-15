@@ -247,7 +247,7 @@ jobs:
 # This would translate to TEST:cpmap rules (6)!
   run-rules-6:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.deploy-run == 'false' || needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.deploy-run == 'false' && (needs.check-values.outputs.tag-run == 'true' || github.ref_name == 'envvar') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
