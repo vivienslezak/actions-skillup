@@ -148,7 +148,7 @@ jobs:
 # Translates to GL REPORTING rules (2)!
   run-rules-2:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tag-run == 'true' && github.event_name == 'push' }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tag-run == 'true' }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
