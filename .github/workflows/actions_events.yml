@@ -3,7 +3,7 @@ on:
   push:
     branches: [ '*' ]
   pull_request:
-  workflow_dispatch:
+#  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -56,9 +56,10 @@ jobs:
         id: set-deploy-run
         run: |
           PUSH_DEPLOY_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
-          PR_DEPLOY_MESSAGE=$(echo "${{ github.event.pull_request.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
-          DISPATCH_DEPLOY_MESSAGE=$(echo "${{ github.event.workflow_dispatch.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
-          if [ "$DEPLOY_MESSAGE" -ge "1" ] || [ "$PR_DEPLOY_MESSAGE" -ge "1" ] || [ "DISPATCH_DEPLOY_MESSAGE" -ge "1" ]; then
+          #PR_DEPLOY_MESSAGE=$(echo "${{ github.event.pull_request.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
+          #DISPATCH_DEPLOY_MESSAGE=$(echo "${{ github.event.workflow_dispatch.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
+          #if [ "$DEPLOY_MESSAGE" -ge "1" ] || [ "$PR_DEPLOY_MESSAGE" -ge "1" ] || [ "$DISPATCH_DEPLOY_MESSAGE" -ge "1" ]; then
+          if [ "$DEPLOY_MESSAGE" -ge "1" ]; then
             echo "deploy-run=true" >> "$GITHUB_OUTPUT"
           else
             echo "deploy-run=false" >> "$GITHUB_OUTPUT"
@@ -199,7 +200,7 @@ jobs:
 # This would translate to BUILD:mtu-cpmap, BUILD:navu-cpmap and all other mtu-cpmap and navu-cpmap rules (5)!
   run-rules-5-build-navu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-navu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' && needs.check-values.outputs.build-navu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -211,7 +212,7 @@ jobs:
 
   run-rules-5-build-mtu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-mtu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' && needs.check-values.outputs.build-mtu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -223,7 +224,7 @@ jobs:
 
   run-rules-5-verify-navu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-navu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' && needs.check-values.outputs.verify-navu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
@@ -235,7 +236,7 @@ jobs:
 
   run-rules-5-verify-mtu-cpmap:
     needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.verify-mtu-cpmap == 'true') }}
+    if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' && needs.check-values.outputs.verify-mtu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
 #      - name: Checkout code
