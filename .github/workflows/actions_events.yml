@@ -45,10 +45,10 @@ jobs:
         id: set-workflow-run
         run: |
           if [[ ${{ steps.set-open-pr.outputs.open-pr }} == 'true' ]] && [[ ${{ github.event_name }} == 'push' ]] && [[ ${{ github.ref_type }} == 'branch' ]]; then
-#            echo "workflow-run=false" >> "$GITHUB_OUTPUT"
+            #echo "workflow-run=false" >> "$GITHUB_OUTPUT"
             echo "workflow-run=true" >> "$GITHUB_OUTPUT"
           else
-#            echo "workflow-run=true" >> "$GITHUB_OUTPUT"
+            #echo "workflow-run=true" >> "$GITHUB_OUTPUT"
             echo "workflow-run=false" >> "$GITHUB_OUTPUT"
           fi
 
