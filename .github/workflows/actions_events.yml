@@ -55,8 +55,10 @@ jobs:
       - name: Set deploy-run output
         id: set-deploy-run
         run: |
-          DEPLOY_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
-          if [ "$DEPLOY_MESSAGE" -ge "1" ]; then
+          PUSH_DEPLOY_MESSAGE=$(echo "${{ github.event.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
+          PR_DEPLOY_MESSAGE=$(echo "${{ github.event.pull_request.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
+          DISPATCH_DEPLOY_MESSAGE=$(echo "${{ github.event.workflow_dispatch.head_commit.message }}" | grep "DEPLOYME$" | wc -l)
+          if [ "$DEPLOY_MESSAGE" -ge "1" ] || [ "$PR_DEPLOY_MESSAGE" -ge "1" ] || [ "DISPATCH_DEPLOY_MESSAGE" -ge "1" ]; then
             echo "deploy-run=true" >> "$GITHUB_OUTPUT"
           else
             echo "deploy-run=false" >> "$GITHUB_OUTPUT"
@@ -194,7 +196,7 @@ jobs:
 # IF commit message 'DEPLOYME' OR commit branch is develop OR commit tag is regex match /
 # OR branch assoicated with commit AND not develop branch AND changes happen on paths /
 # OR Pull Request target branch is develop -> run
-# This would translate to BUILD:mtu-cpmap and BUILD:navu-cpmap rules (5)!
+# This would translate to BUILD:mtu-cpmap, BUILD:navu-cpmap and all other mtu-cpmap and navu-cpmap rules (5)!
   run-rules-5-build-navu-cpmap:
     needs: check-values
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' || needs.check-values.outputs.build-navu-cpmap == 'true') }}
@@ -294,6 +296,9 @@ jobs:
     if: ${{ needs.check-values.outputs.workflow-run == 'true' && needs.check-values.outputs.tests-run == 'true' && ( github.base_ref == 'envvar' || needs.check-values.outputs.test-other-plugins == 'true') }}
     runs-on: ubuntu-latest
     steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+
       - name: Run tests
         run: |
           echo "Rules 7 test-other-plugins matched."
