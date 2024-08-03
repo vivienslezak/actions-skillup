@@ -163,7 +163,8 @@ jobs:
 # This rule is equivalent to GL workflow rules (1)!
   run-rules-success:
     needs: [check-values, cpmap-test-eval]
-    if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'success' && needs.check-values.outputs.workflow-run == 'true' }}
+    #if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'success' && needs.check-values.outputs.workflow-run == 'true' }}
+    if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'success'  && needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' && needs.check-values.outputs.build-navu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Run tests
@@ -177,7 +178,8 @@ jobs:
 
   run-rules-fail:
     needs: [check-values, cpmap-test-eval]
-    if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'failure' && needs.check-values.outputs.workflow-run == 'true' }}
+    #if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'failure' && needs.check-values.outputs.workflow-run == 'true' }}
+    if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'failure' && needs.check-values.outputs.workflow-run == 'true' && (needs.check-values.outputs.tag-run == 'true' || needs.check-values.outputs.deploy-run == 'true' || github.ref_name == 'envvar' || github.base_ref == 'envvar' || github.ref_type == 'branch' && github.ref_name != 'envvar' && needs.check-values.outputs.build-navu-cpmap == 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Run tests
