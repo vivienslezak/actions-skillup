@@ -2,10 +2,9 @@ name: actions_events
 on:
   push:
     branches: [ '*' ]
+    tags: 'v[0-9]+.[0-9]+.[0-9]+'
   pull_request:
   workflow_dispatch:
-  tags:
-    - 'v[0-9]+.[0-9]+.[0-9]+'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
