@@ -144,7 +144,7 @@ jobs:
   cpmap-test-eval:
     needs: [check-values]
     if: always()
-    runs-on: cpmap
+    runs-on: ubuntu-latest
     steps:
       - name: 'Set cpmap-test-eval'
         id: set-cpmap-test-eval
