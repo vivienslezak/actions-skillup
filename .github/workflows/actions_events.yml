@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
   cancel-in-progress: true
 
+env:
+  LOFASZ: "success"
+
 jobs:
   check-values:
     runs-on: ubuntu-latest
@@ -138,15 +141,50 @@ jobs:
       verify-navu-cpmap: ${{ steps.set-dir-change.outputs.verify-navu-cpmap }}
       verify-mtu-cpmap: ${{ steps.set-dir-change.outputs.verify-mtu-cpmap }}
 
+  cpmap-test-eval:
+    needs: [check-values]
+    if: always()
+    runs-on: cpmap
+    steps:
+      - name: 'Set cpmap-test-eval'
+        id: set-cpmap-test-eval
+        run: |
+          if [[ "${{ env.LOFASZ }}" == "failure" ]]; then
+            echo "One or all of the tests failed. Canceling workflow..."
+            curl -s -L -X POST -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel
+            echo "cpmap-test-eval=failure" >> "$GITHUB_OUTPUT"
+          else
+            echo "cpmap-test-eval=success" >> "$GITHUB_OUTPUT"
+          fi
+
+    outputs:
+      cpmap-test-eval: ${{ steps.set-cpmap-test-eval.outputs.cpmap-test-eval }}
+
 # IF no open merge PR present AND push event AND ref type is branch -> run
 # This rule is equivalent to GL workflow rules (1)!
-  run-rules-1:
-    needs: check-values
-    if: ${{ needs.check-values.outputs.workflow-run == 'true' }}
+  run-rules-success:
+    needs: [check-values, cpmap-test-eval]
+    if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'success' && needs.check-values.outputs.workflow-run == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Run tests
         run: |
+          echo "SUCCESS"
+          echo "Test eval: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval }}"
+          echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , opr head ref: ${{ github.head_ref }} , opr base ref: ${{ github.base_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
+          echo "Dir check values - test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
+          echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} , deploy-run: ${{ needs.check-values.outputs.deploy-run }} , tests-run: ${{ needs.check-values.outputs.tests-run }} ."
+          echo "Versioning sh values - compile-version: ${{ needs.check-values.outputs.compile-version }} , publish-version: ${{ needs.check-values.outputs.publish-version }} , publish-repository: ${{ needs.check-values.outputs.publish-repository }} , package-profile: ${{ needs.check-values.outputs.package-profile }} , reporting-profile: ${{ needs.check-values.outputs.reporting-profile }}"
+
+  run-rules-fail:
+    needs: [check-values, cpmap-test-eval]
+    if: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval == 'failure' && needs.check-values.outputs.workflow-run == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run tests
+        run: |
+          echo "FAIL"
+          echo "Test eval: ${{ needs.cpmap-test-eval.outputs.cpmap-test-eval }}"
           echo "Variable values - event name: ${{ github.event_name }} , ref: ${{ github.ref }} , ref type: ${{ github.ref_type }} , opr head ref: ${{ github.head_ref }} , opr base ref: ${{ github.base_ref }} , ref name: ${{ github.ref_name }} , commit_message: ${{ github.event.head_commit.message }} ."
           echo "Dir check values - test-cpmap-keymanager dir: ${{ needs.check-values.outputs.test-cpmap-keymanager }} , test-mapper-integtest dir: ${{ needs.check-values.outputs.test-mapper-integtest }} , test-other-plugins dir: ${{ needs.check-values.outputs.test-other-plugins }} , build-navu-cpmap dir: ${{ needs.check-values.outputs.build-navu-cpmap }} , build-mtu-cpmap dir: ${{ needs.check-values.outputs.build-mtu-cpmap }} , verify-navu-cpmap dir: ${{ needs.check-values.outputs.verify-navu-cpmap }} , verify-mtu-cpmap dir: ${{ needs.check-values.outputs.verify-mtu-cpmap }} ."
           echo "Custom outputs values - open-pr: ${{ needs.check-values.outputs.open-pr }} , workflow-run: ${{ needs.check-values.outputs.workflow-run}} , tag-run: ${{ needs.check-values.outputs.tag-run }} , deploy-run: ${{ needs.check-values.outputs.deploy-run }} , tests-run: ${{ needs.check-values.outputs.tests-run }} ."
