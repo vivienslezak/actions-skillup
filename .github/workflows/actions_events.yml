@@ -1,8 +1,7 @@
 name: actions_events
 on:
   push:
-    branches: [ '*' ]
-    tags: 'v4.1.1'
+    branches: [ '**' ]
   pull_request:
   workflow_dispatch:
 
