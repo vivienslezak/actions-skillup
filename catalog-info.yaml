@@ -1,0 +1,16 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: demo
+  description: "Simple Java project for Pipeline Demo."
+  tags:
+    - cicd
+    - demo
+    - java
+  annotations:
+    github.com/project-slug: vivienslezak/actions-skillup
+spec:
+  type: service
+  lifecycle: experimental
+  owner: demo.com
+  system: Demo
