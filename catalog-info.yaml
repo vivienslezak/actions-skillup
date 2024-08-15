@@ -8,9 +8,9 @@ metadata:
     - demo
     - java
   annotations:
-    github.com/project-slug: vivienslezak/actions-skillup
+    github.com/project-slug: 'vivienslezak/actions-skillup'
 spec:
   type: service
   lifecycle: experimental
-  owner: demo.com
+  owner: user:guest
   system: Demo
